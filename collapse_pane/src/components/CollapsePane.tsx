@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { MutableRefObject, useMemo, useRef } from "react";
 
 export interface CollapsePaneProps {
     collapsed: boolean,
@@ -34,8 +34,20 @@ export interface CollapsePaneProps {
     children: [React.ReactChild, React.ReactChild]
 }
 
+interface CaptureState {
+    isCaptured: boolean;
+    startPosition: number;
+}
+
 export function CollapsePane(props: CollapsePaneProps) {
+    /**
+     * step for the delimeter move and element size
+     */
+    const moveStep = 3;
     const columnTemplate = useMemo(() => calculateColumnTemplate(props.childSizes, props.collapsedSize), [props.childSizes]);
+    const captureState = useRef<CaptureState>({ isCaptured: false, startPosition: 0 })
+    const firstElement = useRef<HTMLDivElement>(null);
+    const secondElement = useRef<HTMLDivElement>(null);
 
     const containerStyle = {
         width: '100%',
@@ -60,13 +72,46 @@ export function CollapsePane(props: CollapsePaneProps) {
         cursor: 'col-resize',
     };
 
-    return <div style={containerStyle}>
-        <div style={firstElementStyle}>{props.children[0]}</div>
-        <div style={secondElementStyle}>{props.children[1]}</div>
-        <div style={delimeterStyle} onMouseDown></div>
+    const onDelimeterMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        captureState.current.isCaptured = true;
+        captureState.current.startPosition = e.clientX;
+    };
+
+    const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (captureState.current.isCaptured) {
+            // translate the delimeter here
+        }
+    }
+
+    const releaseDelimeter = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (captureState.current.isCaptured && firstElement.current && secondElement.current) {
+            captureState.current.isCaptured = false;
+            const firstElementSize = firstElement.current.clientWidth;
+            const secondElementSize = secondElement.current.clientWidth;
+            const delta = e.clientX - captureState.current.startPosition;
+            const newSizes = calculateSizes(props.isVertical, props.isInverted, delta, firstElementSize, secondElementSize, moveStep);
+            props.onSizeChanged(newSizes);
+        }
+    }
+
+    return <div style={containerStyle} onMouseLeave={releaseDelimeter} onMouseUp={releaseDelimeter} onMouseMove={e => onMouseMove(e)}>
+        <div style={firstElementStyle} ref={firstElement}>{props.children[0]}</div>
+        <div style={secondElementStyle} ref={secondElement}>{props.children[1]}</div>
+        <div style={delimeterStyle} onMouseDown={onDelimeterMouseDown}></div>
     </div>;
 }
 
 function calculateColumnTemplate(sizes: [number, number], collapsedSize: number): string {
     return `minmax(${collapsedSize}px, ${sizes[0]}fr) 5px ${sizes[1]}fr`;;
+}
+
+function calculateSizes(
+    isVertical: boolean | undefined,
+    isInverted: boolean | undefined,
+    delta: number,
+    firstElementSize: number,
+    secondElementSize: number,
+    step: number): [number, number] {
+    // use greatest common devisor here
+    throw new Error("Function not implemented.");
 }
