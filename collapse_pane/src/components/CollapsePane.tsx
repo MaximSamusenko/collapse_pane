@@ -1,10 +1,10 @@
-import React, { MutableRefObject, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 export interface CollapsePaneProps {
     collapsed: boolean,
     /**
      * this sizes are relative
-     * ex: [1,2] second element is two times bigger then the first
+     * ex: [1,2] second element is two times bigger than the first
      */
     childSizes: [number, number];
     /** this size is absolute, and is using for collapsed element */
@@ -15,7 +15,7 @@ export interface CollapsePaneProps {
     /** by defatult horisontal */
     isVertical?: boolean;
 
-    /** if horisontal inverted collapse pane will collapse left elemen
+    /** if horisontal inverted collapse pane will collapse left element
      *  if verticatl inverted collapse pane will collapse bottom element
      */
     isInverted?: boolean;
@@ -37,6 +37,7 @@ interface CaptureState {
     startPosition: number;
 }
 
+// todo add snap points
 export function CollapsePane(props: CollapsePaneProps) {
     /**
      * step for the delimeter move and element size
@@ -50,8 +51,6 @@ export function CollapsePane(props: CollapsePaneProps) {
     const secondElement = useRef<HTMLDivElement>(null);
 
     const containerStyle = {
-        width: '100%',
-        height: '100%',
         display: 'grid',
         gridTemplateColumns: columnTemplate,
         gridTemplateRows: '100%',
@@ -69,16 +68,27 @@ export function CollapsePane(props: CollapsePaneProps) {
         backgroundColor: 'black',
         width: '100%',
         height: '100%',
-        cursor: props.collapsed? 'inherit' : 'col-resize',
-        transform: delimeterTranslate,
+        cursor: props.collapsed ? 'inherit' : 'col-resize',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        userSelect: 'none',
+        position: 'relative',
+    };
+
+    const movingDelimeterStyle = {
+        position: 'absolute',
+        transform: delimeterTranslate,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: captureState.current.isCaptured ? 'block' : 'none',
+        backgroundColor: 'red',
     };
 
     const onDelimeterMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!props.collapsed) {
-            unFocus();
             captureState.current.isCaptured = true;
             captureState.current.startPosition = e.clientX;
         }
@@ -108,12 +118,13 @@ export function CollapsePane(props: CollapsePaneProps) {
         <div style={delimeterStyle} onMouseDown={onDelimeterMouseDown}>
             <span style={{ height: `${props.collapseButtonOffset}%` }} />
             {props.collapsed ? props.expandButton : props.collapseButton}
+            <div style={movingDelimeterStyle} />
         </div>
     </div>;
 }
 
 function calculateColumnTemplate(sizes: [number, number], collapsedSize: number, collapsed: boolean): string {
-    if(collapsed) {
+    if (collapsed) {
         return `${collapsedSize}px 5px auto`;
     }
     return `minmax(${collapsedSize}px, ${sizes[0]}fr) 5px ${sizes[1]}fr`;
@@ -128,26 +139,9 @@ function calculateSizes(
     step: number): [number, number] {
     let firstRoundedSize = step * (((firstElementSize + delta) / step) | 0);
     let secondRoundedSize = step * (((secondElementSize - delta) / step) | 0);
-    const devisor = gcd(firstElementSize, secondElementSize);
-    firstRoundedSize /= devisor;
-    secondRoundedSize /= devisor;
     return [firstRoundedSize, secondRoundedSize];
 }
 function calculateDelimeterTranslate(delimeterOffset: number, step: number, isVertical: boolean | undefined): any {
     const offset = step * ((delimeterOffset / step) | 0);
     return `translateX(${offset}px)`;
-}
-
-function gcd(a: number, b: number): number {
-    if (!b) {
-        return a;
-    }
-    return gcd(b, a % b);
-}
-
-function unFocus() {
-    try {
-        window.getSelection()?.removeAllRanges();
-    } catch (e) { }
-
 }
