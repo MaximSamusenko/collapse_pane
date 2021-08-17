@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useMemo, useRef } from "react";
+import React, { MutableRefObject, useMemo, useRef, useState } from "react";
 
 export interface CollapsePaneProps {
     collapsed: boolean,
@@ -11,8 +11,6 @@ export interface CollapsePaneProps {
     collapsedSize: number;
 
     onSizeChanged: (sizes: [number, number]) => void;
-
-    onCollapseButtonClicked: () => void;
 
     /** by defatult horisontal */
     isVertical?: boolean;
@@ -44,7 +42,9 @@ export function CollapsePane(props: CollapsePaneProps) {
      * step for the delimeter move and element size
      */
     const moveStep = 3;
-    const columnTemplate = useMemo(() => calculateColumnTemplate(props.childSizes, props.collapsedSize), [props.childSizes]);
+    const columnTemplate = useMemo(() => calculateColumnTemplate(props.childSizes, props.collapsedSize, props.collapsed), [props.childSizes, props.collapsedSize, props.collapsed]);
+    const [delimeterOffset, setOffset] = useState<number>(0);
+    const delimeterTranslate = useMemo(() => calculateDelimeterTranslate(delimeterOffset, moveStep, props.isVertical), [delimeterOffset]);
     const captureState = useRef<CaptureState>({ isCaptured: false, startPosition: 0 })
     const firstElement = useRef<HTMLDivElement>(null);
     const secondElement = useRef<HTMLDivElement>(null);
@@ -69,17 +69,24 @@ export function CollapsePane(props: CollapsePaneProps) {
         backgroundColor: 'black',
         width: '100%',
         height: '100%',
-        cursor: 'col-resize',
+        cursor: props.collapsed? 'inherit' : 'col-resize',
+        transform: delimeterTranslate,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
     };
 
     const onDelimeterMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        captureState.current.isCaptured = true;
-        captureState.current.startPosition = e.clientX;
+        if (!props.collapsed) {
+            unFocus();
+            captureState.current.isCaptured = true;
+            captureState.current.startPosition = e.clientX;
+        }
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (captureState.current.isCaptured) {
-            // translate the delimeter here
+        if (captureState.current && captureState.current.isCaptured) {
+            setOffset(e.clientX - captureState.current.startPosition);
         }
     }
 
@@ -90,6 +97,7 @@ export function CollapsePane(props: CollapsePaneProps) {
             const secondElementSize = secondElement.current.clientWidth;
             const delta = e.clientX - captureState.current.startPosition;
             const newSizes = calculateSizes(props.isVertical, props.isInverted, delta, firstElementSize, secondElementSize, moveStep);
+            setOffset(0);
             props.onSizeChanged(newSizes);
         }
     }
@@ -97,12 +105,18 @@ export function CollapsePane(props: CollapsePaneProps) {
     return <div style={containerStyle} onMouseLeave={releaseDelimeter} onMouseUp={releaseDelimeter} onMouseMove={e => onMouseMove(e)}>
         <div style={firstElementStyle} ref={firstElement}>{props.children[0]}</div>
         <div style={secondElementStyle} ref={secondElement}>{props.children[1]}</div>
-        <div style={delimeterStyle} onMouseDown={onDelimeterMouseDown}></div>
+        <div style={delimeterStyle} onMouseDown={onDelimeterMouseDown}>
+            <span style={{ height: `${props.collapseButtonOffset}%` }} />
+            {props.collapsed ? props.expandButton : props.collapseButton}
+        </div>
     </div>;
 }
 
-function calculateColumnTemplate(sizes: [number, number], collapsedSize: number): string {
-    return `minmax(${collapsedSize}px, ${sizes[0]}fr) 5px ${sizes[1]}fr`;;
+function calculateColumnTemplate(sizes: [number, number], collapsedSize: number, collapsed: boolean): string {
+    if(collapsed) {
+        return `${collapsedSize}px 5px auto`;
+    }
+    return `minmax(${collapsedSize}px, ${sizes[0]}fr) 5px ${sizes[1]}fr`;
 }
 
 function calculateSizes(
@@ -112,6 +126,28 @@ function calculateSizes(
     firstElementSize: number,
     secondElementSize: number,
     step: number): [number, number] {
-    // use greatest common devisor here
-    throw new Error("Function not implemented.");
+    let firstRoundedSize = step * (((firstElementSize + delta) / step) | 0);
+    let secondRoundedSize = step * (((secondElementSize - delta) / step) | 0);
+    const devisor = gcd(firstElementSize, secondElementSize);
+    firstRoundedSize /= devisor;
+    secondRoundedSize /= devisor;
+    return [firstRoundedSize, secondRoundedSize];
+}
+function calculateDelimeterTranslate(delimeterOffset: number, step: number, isVertical: boolean | undefined): any {
+    const offset = step * ((delimeterOffset / step) | 0);
+    return `translateX(${offset}px)`;
+}
+
+function gcd(a: number, b: number): number {
+    if (!b) {
+        return a;
+    }
+    return gcd(b, a % b);
+}
+
+function unFocus() {
+    try {
+        window.getSelection()?.removeAllRanges();
+    } catch (e) { }
+
 }

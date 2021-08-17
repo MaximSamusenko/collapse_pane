@@ -1,10 +1,11 @@
 import React from 'react';
 import { Meta, Story } from '@storybook/react';
 import { CollapsePane, CollapsePaneProps } from '../src/components/CollapsePane';
+import { CollapsePaneFrame } from './CollapsePaneFrame';
 
 const meta: Meta = {
   title: 'Welcome',
-  component: CollapsePane,
+  component: CollapsePaneFrame,
   argTypes: {
     children: {
       control: {
@@ -29,16 +30,7 @@ const props: Partial<CollapsePaneProps> = {
   onCollapseButtonClicked: () => { console.log('collapse button clicked') },
 }
 
-const Template: Story<CollapsePaneProps> = args => (<div style={{ width: '100%', height: '400px' }}><CollapsePane {...args}>
-  <div style={{
-    width: '100%',
-    height: '100%', backgroundColor: 'green'
-  }}></div>
-  <div style={{
-    width: '100%',
-    height: '100%', backgroundColor: 'blue'
-  }}></div>
-</CollapsePane></div>);
+const Template: Story<CollapsePaneProps> = args => <CollapsePaneFrame />;
 
 // By passing using the Args format for exported stories, you can control the props for a component for reuse in a test
 // https://storybook.js.org/docs/react/workflows/unit-testing
