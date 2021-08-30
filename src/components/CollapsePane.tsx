@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { CSSProperties, useMemo, useRef, useState } from "react";
 import { CollapseButton } from "./CollapseButton";
 
 export interface CollapsePaneProps {
@@ -81,7 +81,7 @@ export function CollapsePane(props: CollapsePaneProps) {
         }
     }
 
-    const releaseDelimeter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const releaseDelimeter = (_: React.MouseEvent<HTMLDivElement>) => {
         if (captureState.current.isCaptured && firstElement.current && secondElement.current) {
             captureState.current.isCaptured = false;
 
@@ -154,7 +154,7 @@ function getSecondElementStyle(horisontal: boolean | undefined) {
     return { gridColumn: 3 };
 }
 
-function getDelimeterStyle(horisontal: boolean | undefined, collapsed: boolean) {
+function getDelimeterStyle(horisontal: boolean | undefined, collapsed: boolean): CSSProperties {
     if (horisontal) {
         return {
             gridColumn: 1,
@@ -192,7 +192,7 @@ function getCollapseButtonOffsetStyle(horisontal: boolean | undefined, offset: n
     return { height: `${offset ?? 50}%` };
 }
 
-function getMovingDelimeterStyle(delimeterTranslate: string, isCaptured: boolean) {
+function getMovingDelimeterStyle(delimeterTranslate: string, isCaptured: boolean): CSSProperties {
     return {
         position: 'absolute',
         transform: delimeterTranslate,
