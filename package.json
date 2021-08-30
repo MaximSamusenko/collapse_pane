@@ -3,7 +3,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "source": "src/index.js",
+  "source": "src/index.ts",
   "files": [
     "dist",
     "src"
