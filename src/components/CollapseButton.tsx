@@ -1,7 +1,7 @@
 import React from "react";
 
 export interface CollapseButtonProps {
-    horisontal: boolean,
+    horizontal: boolean,
     inverted: boolean,
     collapsed: boolean,
     onCollapse: () => void,
@@ -11,12 +11,12 @@ export interface CollapseButtonProps {
 }
 
 
-export function CollapseButton({ horisontal, inverted, collapsed, customCollapseButton, customExpandButton, onCollapse, onExpand }: CollapseButtonProps) {
+export function CollapseButton({ horizontal, inverted, collapsed, customCollapseButton, customExpandButton, onCollapse, onExpand }: CollapseButtonProps) {
     if (collapsed) {
         if (customExpandButton) {
             return <span onClick={_ => onExpand()} style={{ cursor: "pointer" }}>{customExpandButton}</span>;
         }
-        if (horisontal) {
+        if (horizontal) {
             if (inverted) {
                 return <UpButton onClick={() => onExpand()} />
             } else {
@@ -33,7 +33,7 @@ export function CollapseButton({ horisontal, inverted, collapsed, customCollapse
         if (customCollapseButton) {
             return <span onClick={_ => onCollapse()} style={{ cursor: "pointer" }}>{customCollapseButton}</span>;
         }
-        if (horisontal) {
+        if (horizontal) {
             if (inverted) {
                 return <DownButton onClick={() => onCollapse()} />
             } else {

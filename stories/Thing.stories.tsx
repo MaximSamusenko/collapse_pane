@@ -27,7 +27,7 @@ const Template: Story<CollapsePaneFrameProps> = args => <CollapsePaneFrame {...a
 export const Default = Template.bind({});
 
 Default.args = {
-  horisontal: false,
+  horizontal: false,
   inverted: false,
   snapPoints: [50, 100, 150, 200, 250],
 };

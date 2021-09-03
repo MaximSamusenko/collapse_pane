@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { CollapsePane } from '../src/components/CollapsePane';
 
 export interface CollapsePaneFrameProps {
-    horisontal: boolean,
+    horizontal: boolean,
     inverted: boolean,
     snapPoints?: number[]
 }
 
-export function CollapsePaneFrame({ horisontal, inverted, snapPoints }: CollapsePaneFrameProps) {
+export function CollapsePaneFrame({ horizontal, inverted, snapPoints }: CollapsePaneFrameProps) {
     const [sizes, setSizes] = useState<[number, number]>([1, 2]);
     const [collapsed, setCollapsed] = useState(false);
 
@@ -36,7 +36,7 @@ export function CollapsePaneFrame({ horisontal, inverted, snapPoints }: Collapse
             onCollapse={() => onCollapse()}
             onExpand={() => onExpand()}
             inverted={inverted}
-            horisontal={horisontal}      
+            horizontal={horizontal}      
             snapPoints={snapPoints}      
         >
             <div style={{

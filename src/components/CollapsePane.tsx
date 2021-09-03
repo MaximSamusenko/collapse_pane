@@ -15,16 +15,18 @@ export interface CollapsePaneProps {
 
     onSizeChanged: (sizes: [number, number]) => void;
 
-    /** by defatult vertical */
-    horisontal?: boolean;
+    /** by default vertical */
+    horizontal?: boolean;
 
-    /** if horisontal inverted collapse pane will collapse left element
-     *  if verticatl inverted collapse pane will collapse bottom element
+    /** if horizontal inverted collapse pane will collapse left element
+     *  if vertical inverted collapse pane will collapse bottom element
      */
     inverted?: boolean;
 
+    // you can use custom collapse button
     collapseButton?: React.ReactElement;
 
+    // you can use custom expand button
     expandButton?: React.ReactElement;
 
     onCollapse: () => void;
@@ -37,7 +39,7 @@ export interface CollapsePaneProps {
     collapseButtonOffset?: number;
 
     /**
-     * positions in pixels left to right and top to bottom in which the delimeter will be magneted
+     * positions in pixels left to right and top to bottom in which the delimiter will be snapped
      */
     snapPoints?: number[];
 
@@ -50,51 +52,51 @@ interface CaptureState {
 }
 
 /**
- * step for the delimeter move and element size
+ * step for the delimiter move and element size
  */
 const moveStep = 3;
 /**
- * the interval in which the delimeter will be snapped to the snap point
+ * the interval in which the delimiter will be snapped to the snap point
  */
 const snappingInterval = 20;
 
 export function CollapsePane(props: CollapsePaneProps) {
     const columnTemplate = useMemo(() => calculateGridTemplate(props.childSizes, props.collapsedSize, props.collapsed, props.inverted),
         [props.childSizes, props.collapsedSize, props.collapsed, props.inverted]);
-    const [delimeterOffset, setOffset] = useState<number>(0);
-    const delimeterTranslate = useMemo(() => calculateDelimeterTranslate(delimeterOffset, moveStep, props.horisontal), [delimeterOffset]);
+    const [delimiterOffset, setOffset] = useState<number>(0);
+    const delimiterTranslate = useMemo(() => calculateDelimiterTranslate(delimiterOffset, moveStep, props.horizontal), [delimiterOffset]);
     const captureState = useRef<CaptureState>({ isCaptured: false, startPosition: 0 })
     const firstElement = useRef<HTMLDivElement>(null);
     const secondElement = useRef<HTMLDivElement>(null);
 
-    const onDelimeterMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    const onDelimiterMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
         if (!props.collapsed) {
             captureState.current.isCaptured = true;
-            captureState.current.startPosition = props.horisontal ? e.clientY : e.clientX;
+            captureState.current.startPosition = props.horizontal ? e.clientY : e.clientX;
         }
     };
 
     const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         if (captureState.current && captureState.current.isCaptured) {
-            const offset = calculateOffset(props.horisontal ? e.clientY : e.clientX, captureState.current.startPosition, props.childSizes[0], props.snapPoints);
+            const offset = calculateOffset(props.horizontal ? e.clientY : e.clientX, captureState.current.startPosition, props.childSizes[0], props.snapPoints);
             setOffset(offset);
         }
     }
 
-    const releaseDelimeter = (_: React.MouseEvent<HTMLDivElement>) => {
+    const releaseDelimiter = (_: React.MouseEvent<HTMLDivElement>) => {
         if (captureState.current.isCaptured && firstElement.current && secondElement.current) {
             captureState.current.isCaptured = false;
 
-            if (props.horisontal) {
+            if (props.horizontal) {
                 const firstElementSize = firstElement.current.clientHeight;
                 const secondElementSize = secondElement.current.clientHeight;
-                const delta = delimeterOffset;
+                const delta = delimiterOffset;
                 const newSizes = calculateSizes(delta, firstElementSize, secondElementSize, moveStep);
                 props.onSizeChanged(newSizes);
             } else {
                 const firstElementSize = firstElement.current.clientWidth;
                 const secondElementSize = secondElement.current.clientWidth;
-                const delta = delimeterOffset;
+                const delta = delimiterOffset;
                 const newSizes = calculateSizes(delta, firstElementSize, secondElementSize, moveStep);
                 props.onSizeChanged(newSizes);
             }
@@ -103,30 +105,30 @@ export function CollapsePane(props: CollapsePaneProps) {
     }
 
     return <div
-        style={getContainerStyle(props.horisontal, columnTemplate)}
-        onMouseLeave={releaseDelimeter}
-        onMouseUp={releaseDelimeter}
+        style={getContainerStyle(props.horizontal, columnTemplate)}
+        onMouseLeave={releaseDelimiter}
+        onMouseUp={releaseDelimiter}
         onMouseMove={e => onMouseMove(e)}>
-        <div style={getFirstElementStyle(props.horisontal)} ref={firstElement}>{props.children[0]}</div>
-        <div style={getSecondElementStyle(props.horisontal)} ref={secondElement}>{props.children[1]}</div>
-        <div style={getDelimeterStyle(props.horisontal, props.collapsed)} onMouseDown={onDelimeterMouseDown}>
-            <span style={getCollapseButtonOffsetStyle(props.horisontal, props.collapseButtonOffset)} />
+        <div style={getFirstElementStyle(props.horizontal)} ref={firstElement}>{props.children[0]}</div>
+        <div style={getSecondElementStyle(props.horizontal)} ref={secondElement}>{props.children[1]}</div>
+        <div style={getDelimiterStyle(props.horizontal, props.collapsed)} onMouseDown={onDelimiterMouseDown}>
+            <span style={getCollapseButtonOffsetStyle(props.horizontal, props.collapseButtonOffset)} />
             <CollapseButton
                 collapsed={props.collapsed}
                 inverted={!!props.inverted}
-                horisontal={!!props.horisontal}
+                horizontal={!!props.horizontal}
                 customCollapseButton={props.collapseButton}
                 customExpandButton={props.expandButton}
                 onCollapse={props.onCollapse}
                 onExpand={props.onExpand}
             />
-            <div style={getMovingDelimeterStyle(delimeterTranslate, captureState.current.isCaptured)} />
+            <div style={getMovingDelimiterStyle(delimiterTranslate, captureState.current.isCaptured)} />
         </div>
     </div>;
 }
 
-function getContainerStyle(horisontal: boolean | undefined, gridTemplate: string) {
-    if (horisontal) {
+function getContainerStyle(horizontal: boolean | undefined, gridTemplate: string) {
+    if (horizontal) {
         return {
             display: 'grid',
             gridTemplateColumns: '100%',
@@ -140,22 +142,22 @@ function getContainerStyle(horisontal: boolean | undefined, gridTemplate: string
     };
 }
 
-function getFirstElementStyle(horisontal: boolean | undefined) {
-    if (horisontal) {
+function getFirstElementStyle(horizontal: boolean | undefined) {
+    if (horizontal) {
         return { gridRow: 1 };
     }
     return { gridColumn: 1 };
 }
 
-function getSecondElementStyle(horisontal: boolean | undefined) {
-    if (horisontal) {
+function getSecondElementStyle(horizontal: boolean | undefined) {
+    if (horizontal) {
         return { gridRow: 3 };
     }
     return { gridColumn: 3 };
 }
 
-function getDelimeterStyle(horisontal: boolean | undefined, collapsed: boolean): CSSProperties {
-    if (horisontal) {
+function getDelimiterStyle(horizontal: boolean | undefined, collapsed: boolean): CSSProperties {
+    if (horizontal) {
         return {
             gridColumn: 1,
             gridRow: 2,
@@ -185,17 +187,17 @@ function getDelimeterStyle(horisontal: boolean | undefined, collapsed: boolean):
     };
 }
 
-function getCollapseButtonOffsetStyle(horisontal: boolean | undefined, offset: number | undefined) {
-    if (horisontal) {
+function getCollapseButtonOffsetStyle(horizontal: boolean | undefined, offset: number | undefined) {
+    if (horizontal) {
         return { width: `${offset ?? 50}%` };
     }
     return { height: `${offset ?? 50}%` };
 }
 
-function getMovingDelimeterStyle(delimeterTranslate: string, isCaptured: boolean): CSSProperties {
+function getMovingDelimiterStyle(delimiterTranslate: string, isCaptured: boolean): CSSProperties {
     return {
         position: 'absolute',
-        transform: delimeterTranslate,
+        transform: delimiterTranslate,
         top: 0,
         left: 0,
         right: 0,
@@ -226,8 +228,8 @@ function calculateSizes(
     return [firstRoundedSize, secondRoundedSize];
 }
 
-function calculateDelimeterTranslate(delimeterOffset: number, step: number, isVertical?: boolean): any {
-    const offset = step * ((delimeterOffset / step) | 0);
+function calculateDelimiterTranslate(delimiterOffset: number, step: number, isVertical?: boolean): any {
+    const offset = step * ((delimiterOffset / step) | 0);
     if (isVertical) {
         return `translateY(${offset}px)`
     }

@@ -15,23 +15,19 @@ yarn add redux-react-collapse-pane
 Once installed you can import the `CollapsePane` component in your code.
 
 ```ts
-import CollapsePane from "redux-react-collapse-pane";
-```
-
-If you're using Typescript the `SplitPaneProps`, as well as a few other helper types type is also available.
-```ts
-import { SplitPane, SplitPaneProps, ResizerOptions, CollapseOptions, SplitPaneHooks } from "react-collapse-pane";
+import { CollapsePane } from "redux-react-collapse-pane";
 ```
 # Quick Start Usage
 
 To resize your components you need to wrap it out with CollapsePane frame. 
 The idea of this implementation of pane is to control the collapsing and resizing from the parent component.
 This will enable you to persist collapse pane in redux and update the pane from redux state.
+
 The required props are:
 - childSizes - [number, number] is a proportional sizes of the splitting elements
 - collapsedSize - number is a size to which you element will be collapsed
 - onSizeChanged - ([number, number]) => void is a callback which will be called once the element sizes changed
-- collapsed - boolean is a flag which determins if the element is collapsed
+- collapsed - boolean is a flag which determines if the element is collapsed
 - onCollapse - () => void is a callback which will be called once the collapse button will be called
 - onExpand - () => void is a callback which will be called once the expand button will be called
 
@@ -67,11 +63,11 @@ This will be vertical panel, it's left element will be collapsible.
 
       onSizeChanged: (sizes: [number, number]) => void;
 
-      /** by defatult vertical */
-      horisontal?: boolean;
+      /** by default vertical */
+      horizontal?: boolean;
 
-      /** if horisontal inverted collapse pane will collapse left element
-       *  if verticatl inverted collapse pane will collapse bottom element
+      /** if horizontal inverted collapse pane will collapse left element
+       *  if vertical inverted collapse pane will collapse bottom element
        */
       inverted?: boolean;
 
@@ -91,7 +87,7 @@ This will be vertical panel, it's left element will be collapsible.
       collapseButtonOffset?: number;
 
       /**
-       * positions in pixels left to right and top to bottom in which the delimeter will be magneted
+       * positions in pixels left to right and top to bottom in which the delimiter will be snapped
        */
       snapPoints?: number[];
 
