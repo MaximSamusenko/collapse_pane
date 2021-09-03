@@ -38,6 +38,14 @@
   },
   "name": "redux-react-collapse-pane",
   "author": "m.v.samusenko",
+  "keywords": [
+    "redux",
+    "react",
+    "react-component",
+    "split-pane",
+    "react-split-pane",
+    "es6"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/MaximSamusenko/collapse_pane.git"
