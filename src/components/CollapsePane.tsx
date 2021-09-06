@@ -29,6 +29,12 @@ export interface CollapsePaneProps {
     // you can use custom expand button
     expandButton?: React.ReactElement;
 
+    // color of the separator line
+    separatorColor?: string;
+
+    // color of the moving separator line
+    movingSeparatorColor?: string;
+
     onCollapse: () => void;
 
     onExpand: () => void;
@@ -64,7 +70,7 @@ export function CollapsePane(props: CollapsePaneProps) {
     const columnTemplate = useMemo(() => calculateGridTemplate(props.childSizes, props.collapsedSize, props.collapsed, props.inverted),
         [props.childSizes, props.collapsedSize, props.collapsed, props.inverted]);
     const [delimiterOffset, setOffset] = useState<number>(0);
-    const delimiterTranslate = useMemo(() => calculateDelimiterTranslate(delimiterOffset, moveStep, props.horizontal), [delimiterOffset]);
+    const delimiterTranslate = useMemo(() => calculateSeparatorTranslate(delimiterOffset, moveStep, props.horizontal), [delimiterOffset]);
     const captureState = useRef<CaptureState>({ isCaptured: false, startPosition: 0 })
     const firstElement = useRef<HTMLDivElement>(null);
     const secondElement = useRef<HTMLDivElement>(null);
@@ -111,7 +117,7 @@ export function CollapsePane(props: CollapsePaneProps) {
         onMouseMove={e => onMouseMove(e)}>
         <div style={getFirstElementStyle(props.horizontal)} ref={firstElement}>{props.children[0]}</div>
         <div style={getSecondElementStyle(props.horizontal)} ref={secondElement}>{props.children[1]}</div>
-        <div style={getDelimiterStyle(props.horizontal, props.collapsed)} onMouseDown={onDelimiterMouseDown}>
+        <div style={getSeparatorStyle(props.horizontal, props.collapsed, props.separatorColor)} onMouseDown={onDelimiterMouseDown}>
             <span style={getCollapseButtonOffsetStyle(props.horizontal, props.collapseButtonOffset)} />
             <CollapseButton
                 collapsed={props.collapsed}
@@ -122,7 +128,7 @@ export function CollapsePane(props: CollapsePaneProps) {
                 onCollapse={props.onCollapse}
                 onExpand={props.onExpand}
             />
-            <div style={getMovingDelimiterStyle(delimiterTranslate, captureState.current.isCaptured)} />
+            <div style={getMovingSeparatorStyle(delimiterTranslate, captureState.current.isCaptured, props.movingSeparatorColor)} />
         </div>
     </div>;
 }
@@ -144,24 +150,24 @@ function getContainerStyle(horizontal: boolean | undefined, gridTemplate: string
 
 function getFirstElementStyle(horizontal: boolean | undefined) {
     if (horizontal) {
-        return { gridRow: 1 };
+        return { display: 'grid', gridRow: 1 };
     }
-    return { gridColumn: 1 };
+    return { display: 'grid', gridColumn: 1 };
 }
 
 function getSecondElementStyle(horizontal: boolean | undefined) {
     if (horizontal) {
-        return { gridRow: 3 };
+        return { display: 'grid', gridRow: 3 };
     }
-    return { gridColumn: 3 };
+    return { display: 'grid', gridColumn: 3 };
 }
 
-function getDelimiterStyle(horizontal: boolean | undefined, collapsed: boolean): CSSProperties {
+function getSeparatorStyle(horizontal: boolean | undefined, collapsed: boolean, separatorColor: string | undefined): CSSProperties {
     if (horizontal) {
         return {
             gridColumn: 1,
             gridRow: 2,
-            backgroundColor: 'black',
+            backgroundColor: separatorColor ?? 'black',
             width: '100%',
             height: '100%',
             cursor: collapsed ? 'inherit' : 'row-resize',
@@ -175,7 +181,7 @@ function getDelimiterStyle(horizontal: boolean | undefined, collapsed: boolean):
     return {
         gridColumn: 2,
         gridRow: 1,
-        backgroundColor: 'black',
+        backgroundColor: separatorColor ?? 'black',
         width: '100%',
         height: '100%',
         cursor: collapsed ? 'inherit' : 'col-resize',
@@ -194,16 +200,16 @@ function getCollapseButtonOffsetStyle(horizontal: boolean | undefined, offset: n
     return { height: `${offset ?? 50}%` };
 }
 
-function getMovingDelimiterStyle(delimiterTranslate: string, isCaptured: boolean): CSSProperties {
+function getMovingSeparatorStyle(separatorTranslate: string, isCaptured: boolean, separatorColor: string | undefined): CSSProperties {
     return {
         position: 'absolute',
-        transform: delimiterTranslate,
+        transform: separatorTranslate,
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
         display: isCaptured ? 'block' : 'none',
-        backgroundColor: 'gray',
+        backgroundColor: separatorColor ?? 'gray',
     };
 }
 
@@ -228,7 +234,7 @@ function calculateSizes(
     return [firstRoundedSize, secondRoundedSize];
 }
 
-function calculateDelimiterTranslate(delimiterOffset: number, step: number, isVertical?: boolean): any {
+function calculateSeparatorTranslate(delimiterOffset: number, step: number, isVertical?: boolean): any {
     const offset = step * ((delimiterOffset / step) | 0);
     if (isVertical) {
         return `translateY(${offset}px)`

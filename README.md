@@ -49,48 +49,54 @@ This will be vertical panel, it's left element will be collapsible.
 # All available options
 
 ```tsx
-  export interface CollapsePaneProps {
-      collapsed: boolean,
+export interface CollapsePaneProps {
+    collapsed: boolean,
 
-      /**
-       * this sizes are relative
-       * ex: [1,2] second element is two times bigger than the first
-       */
-      childSizes: [number, number];
+    /**
+     * this sizes are relative
+     * ex: [1,2] second element is two times bigger than the first
+     */
+    childSizes: [number, number];
 
-      /** this size is absolute, and is using for collapsed element */
-      collapsedSize: number;
+    /** this size is absolute, and is using for collapsed element */
+    collapsedSize: number;
 
-      onSizeChanged: (sizes: [number, number]) => void;
+    onSizeChanged: (sizes: [number, number]) => void;
 
-      /** by default vertical */
-      horizontal?: boolean;
+    /** by default vertical */
+    horizontal?: boolean;
 
-      /** if horizontal inverted collapse pane will collapse left element
-       *  if vertical inverted collapse pane will collapse bottom element
-       */
-      inverted?: boolean;
+    /** if horizontal inverted collapse pane will collapse left element
+     *  if vertical inverted collapse pane will collapse bottom element
+     */
+    inverted?: boolean;
 
-      // you can use custom collapse button
-      collapseButton?: React.ReactElement;
+    // you can use custom collapse button
+    collapseButton?: React.ReactElement;
 
-      // you can use custom expand button
-      expandButton?: React.ReactElement;
+    // you can use custom expand button
+    expandButton?: React.ReactElement;
 
-      onCollapse: () => void;
+    // color of the separator line
+    separatorColor?: string;
 
-      onExpand: () => void;
+    // color of the moving separator line
+    movingSeparatorColor?: string;
 
-      /**
-       * offset in % from top to bottom or from left to right, 50 is center
-       */
-      collapseButtonOffset?: number;
+    onCollapse: () => void;
 
-      /**
-       * positions in pixels left to right and top to bottom in which the delimiter will be snapped
-       */
-      snapPoints?: number[];
+    onExpand: () => void;
 
-      children: [React.ReactChild, React.ReactChild]
-  }
+    /**
+     * offset in % from top to bottom or from left to right, 50 is center
+     */
+    collapseButtonOffset?: number;
+
+    /**
+     * positions in pixels left to right and top to bottom in which the delimiter will be snapped
+     */
+    snapPoints?: number[];
+
+    children: [React.ReactChild, React.ReactChild]
+}
 ```

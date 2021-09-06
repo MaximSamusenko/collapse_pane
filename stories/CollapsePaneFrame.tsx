@@ -28,8 +28,6 @@ export function CollapsePaneFrame({ horizontal, inverted, snapPoints }: Collapse
         <CollapsePane
             childSizes={sizes}
             collapsedSize={100}
-            // collapseButton={<button >&lt;&lt;</button>}
-            // expandButton={<button >&gt;&gt;</button>}
             onSizeChanged={(sizes) => onSizeChanged(sizes)}
             collapsed={collapsed}
             collapseButtonOffset={70}
