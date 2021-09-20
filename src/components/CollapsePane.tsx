@@ -58,10 +58,6 @@ interface CaptureState {
 }
 
 /**
- * step for the delimiter move and element size
- */
-const moveStep = 3;
-/**
  * the interval in which the delimiter will be snapped to the snap point
  */
 const snappingInterval = 20;
@@ -70,7 +66,7 @@ export function CollapsePane(props: CollapsePaneProps) {
     const columnTemplate = useMemo(() => calculateGridTemplate(props.childSizes, props.collapsedSize, props.collapsed, props.inverted),
         [props.childSizes, props.collapsedSize, props.collapsed, props.inverted]);
     const [delimiterOffset, setOffset] = useState<number>(0);
-    const delimiterTranslate = useMemo(() => calculateSeparatorTranslate(delimiterOffset, moveStep, props.horizontal), [delimiterOffset]);
+    const delimiterTranslate = useMemo(() => calculateSeparatorTranslate(delimiterOffset, props.horizontal), [delimiterOffset]);
     const captureState = useRef<CaptureState>({ isCaptured: false, startPosition: 0 })
     const firstElement = useRef<HTMLDivElement>(null);
     const secondElement = useRef<HTMLDivElement>(null);
@@ -93,20 +89,16 @@ export function CollapsePane(props: CollapsePaneProps) {
         if (captureState.current.isCaptured && firstElement.current && secondElement.current) {
             captureState.current.isCaptured = false;
 
-            if (props.horizontal) {
-                const firstElementSize = firstElement.current.clientHeight;
-                const secondElementSize = secondElement.current.clientHeight;
-                const delta = delimiterOffset;
-                const newSizes = calculateSizes(delta, firstElementSize, secondElementSize, moveStep);
-                props.onSizeChanged(newSizes);
+            const firstElementSize = props.horizontal ? firstElement.current.clientHeight : firstElement.current.clientWidth;
+            const secondElementSize = props.horizontal ? secondElement.current.clientHeight : secondElement.current.clientWidth;
+            const delta = delimiterOffset;
+            const newSizes = calculateSizes(delta, firstElementSize, secondElementSize);
+            if (paneIsSmallerThanCollapsedSize(newSizes, props.inverted, props.collapsedSize)) {
+                props.onCollapse();
             } else {
-                const firstElementSize = firstElement.current.clientWidth;
-                const secondElementSize = secondElement.current.clientWidth;
-                const delta = delimiterOffset;
-                const newSizes = calculateSizes(delta, firstElementSize, secondElementSize, moveStep);
                 props.onSizeChanged(newSizes);
+                setOffset(0);
             }
-            setOffset(0);
         }
     }
 
@@ -227,19 +219,17 @@ function calculateGridTemplate(sizes: [number, number], collapsedSize: number, c
 function calculateSizes(
     delta: number,
     firstElementSize: number,
-    secondElementSize: number,
-    step: number): [number, number] {
-    let firstRoundedSize = step * (((firstElementSize + delta) / step) | 0);
-    let secondRoundedSize = step * (((secondElementSize - delta) / step) | 0);
+    secondElementSize: number): [number, number] {
+    let firstRoundedSize = firstElementSize + delta;
+    let secondRoundedSize = secondElementSize - delta;
     return [firstRoundedSize, secondRoundedSize];
 }
 
-function calculateSeparatorTranslate(delimiterOffset: number, step: number, isVertical?: boolean): any {
-    const offset = step * ((delimiterOffset / step) | 0);
+function calculateSeparatorTranslate(delimiterOffset: number, isVertical?: boolean): any {
     if (isVertical) {
-        return `translateY(${offset}px)`
+        return `translateY(${delimiterOffset}px)`
     }
-    return `translateX(${offset}px)`;
+    return `translateX(${delimiterOffset}px)`;
 }
 
 function calculateOffset(curPosition: number, startPosition: number, referencePoint: number, snapPoints: number[] | undefined): number {
@@ -253,3 +243,8 @@ function calculateOffset(curPosition: number, startPosition: number, referencePo
     }
     return shift;
 }
+
+function paneIsSmallerThanCollapsedSize(sizes: [number, number], inverted: boolean | undefined, collapsedSize: number): boolean {
+    return inverted ? sizes[1] < collapsedSize : sizes[0] < collapsedSize;
+}
+

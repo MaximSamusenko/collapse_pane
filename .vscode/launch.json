@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:6006",
-            "webRoot": "C:/Users/Maxim/Desktop/js/collapse_pane/collapse_pane"
+            "webRoot": "C:/Users/Maxim/Desktop/js/collapse_pane"
         }
     ]
 }
