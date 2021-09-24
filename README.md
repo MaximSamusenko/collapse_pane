@@ -83,6 +83,9 @@ export interface CollapsePaneProps {
     // color of the moving separator line
     movingSeparatorColor?: string;
 
+    // width of the separator line
+    separatorWidth?: number;
+
     onCollapse: () => void;
 
     onExpand: () => void;

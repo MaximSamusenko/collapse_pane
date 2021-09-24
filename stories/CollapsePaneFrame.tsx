@@ -5,10 +5,11 @@ import { CollapsePane } from '../src/components/CollapsePane';
 export interface CollapsePaneFrameProps {
     horizontal: boolean,
     inverted: boolean,
-    snapPoints?: number[]
+    snapPoints?: number[],
+    separatorWidth?: number,
 }
 
-export function CollapsePaneFrame({ horizontal, inverted, snapPoints }: CollapsePaneFrameProps) {
+export function CollapsePaneFrame({ horizontal, inverted, snapPoints, separatorWidth }: CollapsePaneFrameProps) {
     const [sizes, setSizes] = useState<[number, number]>([1, 2]);
     const [collapsed, setCollapsed] = useState(false);
 
@@ -34,8 +35,9 @@ export function CollapsePaneFrame({ horizontal, inverted, snapPoints }: Collapse
             onCollapse={() => onCollapse()}
             onExpand={() => onExpand()}
             inverted={inverted}
-            horizontal={horizontal}      
-            snapPoints={snapPoints}      
+            horizontal={horizontal}
+            snapPoints={snapPoints}
+            separatorWidth={separatorWidth}
         >
             <div style={{
                 width: '100%',

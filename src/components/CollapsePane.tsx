@@ -35,6 +35,9 @@ export interface CollapsePaneProps {
     // color of the moving separator line
     movingSeparatorColor?: string;
 
+    // width of the separator line
+    separatorWidth?: number;
+
     onCollapse: () => void;
 
     onExpand: () => void;
@@ -63,7 +66,7 @@ interface CaptureState {
 const snappingInterval = 20;
 
 export function CollapsePane(props: CollapsePaneProps) {
-    const columnTemplate = useMemo(() => calculateGridTemplate(props.childSizes, props.collapsedSize, props.collapsed, props.inverted),
+    const columnTemplate = useMemo(() => calculateGridTemplate(props.childSizes, props.collapsedSize, props.collapsed, props.inverted, props.separatorWidth),
         [props.childSizes, props.collapsedSize, props.collapsed, props.inverted]);
     const [delimiterOffset, setOffset] = useState<number>(0);
     const delimiterTranslate = useMemo(() => calculateSeparatorTranslate(delimiterOffset, props.horizontal), [delimiterOffset]);
@@ -205,15 +208,15 @@ function getMovingSeparatorStyle(separatorTranslate: string, isCaptured: boolean
     };
 }
 
-function calculateGridTemplate(sizes: [number, number], collapsedSize: number, collapsed: boolean, inverted?: boolean): string {
+function calculateGridTemplate(sizes: [number, number], collapsedSize: number, collapsed: boolean, inverted?: boolean, separatorWidth?: number): string {
     if (collapsed) {
         if (inverted) {
-            return `auto 2px ${collapsedSize}px`;
+            return `auto ${separatorWidth ?? 2}px ${collapsedSize}px`;
         }
-        return `${collapsedSize}px 2px auto`;
+        return `${collapsedSize}px ${separatorWidth ?? 2}px auto`;
     }
 
-    return `${sizes[0]}fr 2px ${sizes[1]}fr`;
+    return `${sizes[0]}fr ${separatorWidth ?? 2}px ${sizes[1]}fr`;
 }
 
 function calculateSizes(
