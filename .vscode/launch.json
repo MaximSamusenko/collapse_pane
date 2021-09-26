@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "test",
+            "request": "launch",
+            "url": "http://localhost:6006",
+            "webRoot": "C:/Users/Maxim/Desktop/js/collapse_pane",
+            "type": "pwa-node",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "test"
+            ]
+        },
+        {
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Launch Chrome against localhost",
